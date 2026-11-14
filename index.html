@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task-Management Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ─── AUTH SCREEN (Green Card Design) ─── -->
+<div id="authScreen">
+  <div class="auth-bg-orbs">
+    <div class="auth-orb auth-orb-1"></div>
+    <div class="auth-orb auth-orb-2"></div>
+    <div class="auth-orb auth-orb-3"></div>
+  </div>
+  <div class="auth-grid"></div>
+  <canvas id="auth-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0.25;z-index:0;"></canvas>
+
+  <div class="auth-container">
+    <!-- Logo Row -->
+    <div class="auth-logo-row">
+      <div class="auth-logo-icon">✓</div>
+      <div>
+        <div class="auth-logo-text">Task-Management<br>Tracker</div>
+        <div class="auth-logo-sub">GIET University Project</div>
+      </div>
+    </div>
+
+    <!-- Heading -->
+    <div class="auth-main-heading">Welcome Back 👋</div>
+    <div class="auth-main-sub">Sign in or create an account to manage your tasks</div>
+
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">🔑 Login</div>
+      <div class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">✨ Sign Up</div>
+    </div>
+
+    <div class="auth-form-body" id="authFormBody">
+
+      <!-- ── LOGIN FORM ── -->
+      <div id="loginForm">
+        <div id="loginMsg" class="auth-msg"><i class="fa-solid fa-circle-exclamation"></i> <span id="loginMsgText"></span></div>
+
+        <div class="auth-form-group">
+          <label class="auth-form-label"><i class="fa-regular fa-envelope" style="color:#10b981;"></i> &nbsp;EMAIL ADDRESS</label>
+          <div class="auth-input-wrap">
+            <input class="auth-input" id="loginEmail" type="email" placeholder="you@example.com" autocomplete="email" />
+            <i class="auth-input-icon fa-regular fa-envelope"></i>
+          </div>
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-form-label"><i class="fa-solid fa-lock" style="color:#10b981;"></i> &nbsp;PASSWORD <span class="auth-form-label-hint">(min 6 characters)</span></label>
+          <div class="auth-input-wrap">
+            <input class="auth-input" id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()" />
+            <i class="auth-input-icon fa-solid fa-lock"></i>
+            <button class="auth-eye-btn" type="button" onclick="togglePass('loginPassword',this)"><i class="fa-regular fa-eye"></i></button>
+          </div>
+        </div>
+
+        <div class="auth-forgot"><a href="#" onclick="return false;">Forgot password?</a></div>
+
+        <button class="auth-submit-btn" id="loginBtn" onclick="doLogin()">
+          🔑 &nbsp;Login
+        </button>
+
+        <div class="auth-divider"><span>or</span></div>
+
+        <div class="auth-social">
+          <button class="auth-social-btn" onclick="demoLogin()"><i class="fa-solid fa-flask" style="color:#a78bfa;"></i> Demo</button>
+          <button class="auth-social-btn" onclick="switchAuthTab('register')"><i class="fa-solid fa-user-plus" style="color:#34d399;"></i> Register</button>
+        </div>
+
+        <div class="auth-terms">
+          By continuing you agree to our <a href="#">Terms of Service</a> &amp; <a href="#">Privacy Policy</a>
+        </div>
+      </div>
+
+      <!-- ── REGISTER FORM ── -->
+      <div id="registerForm" style="display:none;">
+        <div id="registerMsg" class="auth-msg"><i class="fa-solid fa-circle-exclamation"></i> <span id="registerMsgText"></span></div>
+
+        <div class="auth-form-group">
+          <label class="auth-form-label"><i class="fa-regular fa-user" style="color:#10b981;"></i> &nbsp;FULL NAME</label>
+          <div class="auth-input-wrap">
+            <input class="auth-input" id="regName" type="text" placeholder="Your Name" autocomplete="name" />
+            <i class="auth-input-icon fa-regular fa-user"></i>
+          </div>
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-form-label"><i class="fa-regular fa-envelope" style="color:#10b981;"></i> &nbsp;EMAIL ADDRESS</label>
+          <div class="auth-input-wrap">
+            <input class="auth-input" id="regEmail" type="email" placeholder="you@example.com" autocomplete="email" oninput="validateEmail(this)" />
+            <i class="auth-input-icon fa-regular fa-envelope"></i>
+          </div>
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-form-label"><i class="fa-solid fa-lock" style="color:#10b981;"></i> &nbsp;PASSWORD <span class="auth-form-label-hint">(min 6 characters)</span></label>
+          <div class="auth-input-wrap">
+            <input class="auth-input" id="regPassword" type="password" placeholder="Create a strong password" autocomplete="new-password" oninput="updateStrength(this.value)" />
+            <i class="auth-input-icon fa-solid fa-lock"></i>
+            <button class="auth-eye-btn" type="button" onclick="togglePass('regPassword',this)"><i class="fa-regular fa-eye"></i></button>
+          </div>
+          <div class="strength-row" style="margin-top:7px;">
+            <div class="strength-bar" id="sb1"></div>
+            <div class="strength-bar" id="sb2"></div>
+            <div class="strength-bar" id="sb3"></div>
+            <div class="strength-bar" id="sb4"></div>
+          </div>
+          <div class="strength-text" id="strengthText">Enter a password</div>
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-form-label"><i class="fa-solid fa-shield-halved" style="color:#10b981;"></i> &nbsp;CONFIRM PASSWORD</label>
+          <div class="auth-input-wrap">
+            <input class="auth-input" id="regConfirm" type="password" placeholder="Repeat your password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()" />
+            <i class="auth-input-icon fa-solid fa-shield-halved"></i>
+            <button class="auth-eye-btn" type="button" onclick="togglePass('regConfirm',this)"><i class="fa-regular fa-eye"></i></button>
+          </div>
+        </div>
+
+        <button class="auth-submit-btn" id="registerBtn" onclick="doRegister()">
+          ✨ &nbsp;Create Account
+        </button>
+
+        <div class="auth-terms">
+          Already have an account? <a href="#" onclick="switchAuthTab('login');return false;">Sign in here</a>
+        </div>
+      </div>
+
+    </div><!-- /authFormBody -->
+  </div><!-- /auth-container -->
+</div>
+
+<canvas id="particles-canvas"></canvas>
+
+<!-- ─── ALARM RING MODAL ─── -->
+<div class="alarm-ring-modal" id="alarmRingModal">
+  <div class="alarm-ring-box">
+    <div class="ring-icon">🔔</div>
+    <div class="ring-time-display" id="ringTimeDisplay">07:00</div>
+    <div class="ring-label" id="ringLabelDisplay">Good Morning!</div>
+    <div class="ring-actions">
+      <button class="btn-ring-dismiss" onclick="dismissAlarm()">Dismiss</button>
+      <button class="btn-ring-snooze" onclick="snoozeAlarm()">Snooze 5 min</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── TOAST CONTAINER ─── -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ─── TASK MODAL ─── -->
+<div class="modal-overlay" id="taskModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="taskModalTitle">✨ Add New Task</div>
+      <button class="modal-close" onclick="closeModal('taskModal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Task Title *</label>
+      <input class="form-input" id="taskTitleInput" placeholder="What needs to be done?" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-textarea" id="taskDescInput" placeholder="Add more details..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Priority</label>
+        <select class="form-select" id="taskPriorityInput">
+          <option value="low">🟢 Low</option>
+          <option value="medium" selected>🟡 Medium</option>
+          <option value="high">🔴 High</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="taskCategoryInput">
+          <option value="work">💼 Work</option>
+          <option value="personal">🏠 Personal</option>
+          <option value="study">📚 Study</option>
+          <option value="health">💪 Health</option>
+          <option value="other">📌 Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Due Date</label>
+        <input class="form-input" id="taskDateInput" type="date" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Due Time</label>
+        <input class="form-input" id="taskTimeInput" type="time" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Alarm (optional)</label>
+      <input class="form-input" id="taskAlarmInput" type="time" placeholder="Set alarm time" />
+    </div>
+
+    <!-- Sub-tasks -->
+    <div class="form-group">
+      <label class="form-label">Sub-tasks</label>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <input class="form-input" id="subtaskInput" placeholder="Add a sub-task..." style="flex:1;" onkeydown="if(event.key==='Enter'){event.preventDefault();addSubtask();}" />
+        <button class="btn btn-secondary btn-sm" onclick="addSubtask()"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div id="subtaskList"></div>
+    </div>
+
+    <div class="form-footer">
+      <button class="btn btn-secondary" onclick="closeModal('taskModal')">Cancel</button>
+      <button class="btn btn-primary" id="taskSaveBtn" onclick="saveTask()"><i class="fa-solid fa-check"></i> Save Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ALARM MODAL ─── -->
+<div class="modal-overlay" id="alarmModal">
+  <div class="modal" style="width:460px;">
+    <div class="modal-header">
+      <div class="modal-title">🔔 Add Alarm</div>
+      <button class="modal-close" onclick="closeModal('alarmModal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Alarm Time *</label>
+      <input class="form-input" id="alarmTimeInput" type="time" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Label</label>
+      <input class="form-input" id="alarmLabelInput" placeholder="e.g. Morning standup, Study break..." />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Repeat Days</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;" id="alarmDaysPicker">
+        <button class="btn btn-secondary btn-sm alarm-day-btn" data-day="Sun" onclick="toggleAlarmDay(this)">Sun</button>
+        <button class="btn btn-secondary btn-sm alarm-day-btn" data-day="Mon" onclick="toggleAlarmDay(this)">Mon</button>
+        <button class="btn btn-secondary btn-sm alarm-day-btn" data-day="Tue" onclick="toggleAlarmDay(this)">Tue</button>
+        <button class="btn btn-secondary btn-sm alarm-day-btn" data-day="Wed" onclick="toggleAlarmDay(this)">Wed</button>
+        <button class="btn btn-secondary btn-sm alarm-day-btn" data-day="Thu" onclick="toggleAlarmDay(this)">Thu</button>
+        <button class="btn btn-secondary btn-sm alarm-day-btn" data-day="Fri" onclick="toggleAlarmDay(this)">Fri</button>
+        <button class="btn btn-secondary btn-sm alarm-day-btn" data-day="Sat" onclick="toggleAlarmDay(this)">Sat</button>
+      </div>
+    </div>
+    <div class="form-footer">
+      <button class="btn btn-secondary" onclick="closeModal('alarmModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAlarm()"><i class="fa-solid fa-bell"></i> Set Alarm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── TIMETABLE MODAL ─── -->
+<div class="modal-overlay" id="ttModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📅 Add Schedule</div>
+      <button class="modal-close" onclick="closeModal('ttModal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Event Title *</label>
+      <input class="form-input" id="ttTitleInput" placeholder="Class, Meeting, Study..." />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Day</label>
+        <select class="form-select" id="ttDayInput">
+          <option>Sun</option><option>Mon</option><option>Tue</option>
+          <option>Wed</option><option>Thu</option><option>Fri</option><option>Sat</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Time Slot</label>
+        <select class="form-select" id="ttTimeInput">
+          <option>06:00</option><option>07:00</option><option>08:00</option>
+          <option>09:00</option><option>10:00</option><option>11:00</option>
+          <option>12:00</option><option>13:00</option><option>14:00</option>
+          <option>15:00</option><option>16:00</option><option>17:00</option>
+          <option>18:00</option><option>19:00</option><option>20:00</option>
+          <option>21:00</option><option>22:00</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Color</label>
+      <div class="color-picker-row" id="ttColorPicker">
+        <div class="color-dot selected" style="background:#7c3aed;" data-color="purple" onclick="selectColor(this)"></div>
+        <div class="color-dot" style="background:#06b6d4;" data-color="cyan" onclick="selectColor(this)"></div>
+        <div class="color-dot" style="background:#f59e0b;" data-color="amber" onclick="selectColor(this)"></div>
+        <div class="color-dot" style="background:#10b981;" data-color="green" onclick="selectColor(this)"></div>
+      </div>
+    </div>
+    <div class="form-footer">
+      <button class="btn btn-secondary" onclick="closeModal('ttModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTTEvent()"><i class="fa-solid fa-calendar-plus"></i> Add Event</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── APP WRAPPER ─── -->
+<div class="app-wrapper">
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside class="sidebar">
+    <div class="logo-area">
+      <div class="logo">Task<span>-Management</span></div>
+      <div class="logo-sub">Tracker · GIET Project</div>
+    </div>
+
+    <div class="live-clock">
+      <div class="clock-display" id="liveClock">00:00:00</div>
+      <div class="clock-date" id="liveDate">—</div>
+    </div>
+
+    <div class="progress-section">
+      <div class="progress-label">Today's Progress</div>
+      <div class="progress-ring-wrap">
+        <div class="ring-wrap-rel">
+          <svg class="ring-svg" width="64" height="64">
+            <defs>
+              <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#7c3aed"/>
+                <stop offset="100%" stop-color="#06b6d4"/>
+              </linearGradient>
+            </defs>
+            <circle class="ring-bg" cx="32" cy="32" r="26"/>
+            <circle class="ring-fg" id="ringFg" cx="32" cy="32" r="26" stroke-dasharray="163.4" stroke-dashoffset="163.4"/>
+          </svg>
+          <div class="ring-center" style="position:absolute;top:0;left:0;width:64px;height:64px;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+            <span class="ring-pct" id="ringPct">0%</span>
+          </div>
+        </div>
+        <div class="progress-stats">
+          <div class="stat-row">
+            <span class="stat-label">Completed</span>
+            <span class="stat-val" id="sideStatDone">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Pending</span>
+            <span class="stat-val" id="sideStatPending">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Total</span>
+            <span class="stat-val" id="sideStatTotal">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-title">Menu</div>
+      <div class="nav-item active" data-view="dashboard" onclick="switchView('dashboard', this)">
+        <i class="fa-solid fa-house"></i> Dashboard
+      </div>
+      <div class="nav-item" data-view="tasks" onclick="switchView('tasks', this)">
+        <i class="fa-solid fa-list-check"></i> All Tasks
+        <span class="nav-badge" id="navBadgeTasks">0</span>
+      </div>
+      <div class="nav-item" data-view="timetable" onclick="switchView('timetable', this)">
+        <i class="fa-solid fa-calendar-week"></i> Timetable
+      </div>
+      <div class="nav-item" data-view="alarms" onclick="switchView('alarms', this)">
+        <i class="fa-solid fa-bell"></i> Alarms
+        <span class="nav-badge danger" id="navBadgeAlarms">0</span>
+      </div>
+      <div class="nav-item" onclick="toggleAIPanel()" style="background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(6,182,212,0.06));border:1px solid rgba(124,58,237,0.15);">
+        <i class="fa-solid fa-sparkles" style="color:var(--accent2);"></i> AI Assistant
+        <span class="nav-badge" style="background:linear-gradient(135deg,#7c3aed,#06b6d4);font-size:9px;">NEW</span>
+      </div>
+
+      <div class="nav-title" style="margin-top:16px;">Categories</div>
+      <div class="nav-item" onclick="filterByCategory('work')">
+        <i class="fa-solid fa-briefcase"></i> Work
+      </div>
+      <div class="nav-item" onclick="filterByCategory('personal')">
+        <i class="fa-solid fa-house"></i> Personal
+      </div>
+      <div class="nav-item" onclick="filterByCategory('study')">
+        <i class="fa-solid fa-book"></i> Study
+      </div>
+      <div class="nav-item" onclick="filterByCategory('health')">
+        <i class="fa-solid fa-heart-pulse"></i> Health
+      </div>
+    </div>
+
+    <div class="alarm-section-side">
+      <div class="alarm-mini-label">Active Alarms</div>
+      <div id="sideAlarmList">
+        <div class="empty-state" style="padding:12px 0;">
+          <div style="font-size:12px;color:var(--text3);">No alarms set</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ─── MAIN CONTENT ─── -->
+  <main class="main">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <div>
+          <div class="page-title" id="pageTitle">Dashboard</div>
+          <div class="page-subtitle" id="pageSubtitle">Overview of your tasks &amp; schedules</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="search-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input class="search-input" id="searchInput" placeholder="Search tasks..." oninput="handleSearch()" />
+        </div>
+        <button class="btn btn-secondary" onclick="openModal('alarmModal')" data-tooltip="Add Alarm">
+          <i class="fa-solid fa-bell"></i>
+        </button>
+        <button class="btn btn-secondary" onclick="openModal('pomoModal')" data-tooltip="Pomodoro Timer" style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.2);color:#fca5a5;">
+          <i class="fa-solid fa-stopwatch"></i>
+        </button>
+        <button class="btn btn-secondary" onclick="exportTasks()" data-tooltip="Export Tasks">
+          <i class="fa-solid fa-download"></i>
+        </button>
+        <button class="btn btn-primary" onclick="openTaskModal()">
+          <i class="fa-solid fa-plus"></i> Add Task <span class="shortcut-hint" style="margin-left:4px;opacity:0.7">⌘K</span>
+        </button>
+        <div class="user-avatar" id="userAvatarBtn">
+          <span id="userAvatarInitial">?</span>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-info-drop">
+              <div class="user-info-name" id="dropUserName">—</div>
+              <div class="user-info-email" id="dropUserEmail">—</div>
+            </div>
+            <div class="drop-item"><i class="fa-solid fa-user"></i> My Profile</div>
+            <div class="drop-item"><i class="fa-solid fa-gear"></i> Settings</div>
+            <div class="drop-item danger" onclick="doLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+
+      <!-- ─── DASHBOARD VIEW ─── -->
+      <div class="view active" id="view-dashboard">
+        <div class="welcome-banner fade-in">
+          <div class="welcome-text">
+            <h2 id="welcomeMsg">Good Morning! ☀️</h2>
+            <p>Here's your productivity overview for today. Let's crush it!</p>
+          </div>
+          <div class="welcome-emoji" id="welcomeEmoji">🚀</div>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card" style="cursor:pointer" onclick="switchView('tasks',document.querySelector('[data-view=tasks]'))">
+            <div class="stat-card-glow" style="background:radial-gradient(circle,var(--accent),transparent)"></div>
+            <div class="stat-card-icon" style="background:rgba(124,58,237,0.15);color:var(--accent)">
+              <i class="fa-solid fa-list-check"></i>
+            </div>
+            <div class="stat-card-num" id="statTotal" style="color:var(--accent)">0</div>
+            <div class="stat-card-label">Total Tasks</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-glow" style="background:radial-gradient(circle,var(--accent2),transparent)"></div>
+            <div class="stat-card-icon" style="background:rgba(6,182,212,0.15);color:var(--accent2)">
+              <i class="fa-solid fa-check-circle"></i>
+            </div>
+            <div class="stat-card-num" id="statDone" style="color:var(--accent2)">0</div>
+            <div class="stat-card-label">Completed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-glow" style="background:radial-gradient(circle,var(--accent3),transparent)"></div>
+            <div class="stat-card-icon" style="background:rgba(245,158,11,0.15);color:var(--accent3)">
+              <i class="fa-solid fa-clock"></i>
+            </div>
+            <div class="stat-card-num" id="statPending" style="color:var(--accent3)">0</div>
+            <div class="stat-card-label">Pending</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-glow" style="background:radial-gradient(circle,var(--danger),transparent)"></div>
+            <div class="stat-card-icon" style="background:rgba(239,68,68,0.15);color:var(--danger)">
+              <i class="fa-solid fa-fire"></i>
+            </div>
+            <div class="stat-card-num" id="statHigh" style="color:var(--danger)">0</div>
+            <div class="stat-card-label">High Priority</div>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <div class="section-title">Recent Tasks</div>
+          <button class="btn btn-secondary btn-sm" onclick="switchView('tasks',document.querySelector('[data-view=tasks]'))">View All <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+        <div class="tasks-list" id="dashTaskList"></div>
+
+        <div class="section-header" style="margin-top:32px;">
+          <div class="section-title">Upcoming Alarms</div>
+          <button class="btn btn-secondary btn-sm" onclick="switchView('alarms',document.querySelector('[data-view=alarms]'))">All Alarms <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+        <div class="alarms-grid" id="dashAlarmList" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr));"></div>
+      </div>
+
+      <!-- ─── TASKS VIEW ─── -->
+      <div class="view" id="view-tasks">
+        <div class="section-header">
+          <div class="section-title">All Tasks</div>
+          <button class="btn btn-primary btn-sm" onclick="openTaskModal()"><i class="fa-solid fa-plus"></i> New Task</button>
+        </div>
+
+        <div class="filter-tabs">
+          <div class="filter-tab active" data-filter="all" onclick="setFilter('all',this)">All</div>
+          <div class="filter-tab" data-filter="active" onclick="setFilter('active',this)">Active</div>
+          <div class="filter-tab" data-filter="completed" onclick="setFilter('completed',this)">Completed</div>
+          <div class="filter-tab" data-filter="high" onclick="setFilter('high',this)">High Priority</div>
+          <div class="filter-tab" data-filter="today" onclick="setFilter('today',this)">Due Today</div>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <div class="category-chips" id="catChips">
+            <div class="cat-chip active" data-cat="all" onclick="setCat('all',this)">All Categories</div>
+            <div class="cat-chip" data-cat="work" onclick="setCat('work',this)">💼 Work</div>
+            <div class="cat-chip" data-cat="personal" onclick="setCat('personal',this)">🏠 Personal</div>
+            <div class="cat-chip" data-cat="study" onclick="setCat('study',this)">📚 Study</div>
+            <div class="cat-chip" data-cat="health" onclick="setCat('health',this)">💪 Health</div>
+            <div class="cat-chip" data-cat="other" onclick="setCat('other',this)">📌 Other</div>
+          </div>
+        </div>
+
+        <div class="tasks-list" id="allTaskList"></div>
+      </div>
+
+      <!-- ─── TIMETABLE VIEW ─── -->
+      <div class="view" id="view-timetable">
+        <div class="section-header">
+          <div class="section-title">Weekly Timetable</div>
+          <button class="btn btn-primary btn-sm" onclick="openModal('ttModal')"><i class="fa-solid fa-plus"></i> Add Schedule</button>
+        </div>
+        <div class="timetable-grid">
+          <div class="timetable-header-row">
+            <div class="timetable-day-header">Time</div>
+            <div class="timetable-day-header" id="ttH0">Sun</div>
+            <div class="timetable-day-header" id="ttH1">Mon</div>
+            <div class="timetable-day-header" id="ttH2">Tue</div>
+            <div class="timetable-day-header" id="ttH3">Wed</div>
+            <div class="timetable-day-header" id="ttH4">Thu</div>
+            <div class="timetable-day-header" id="ttH5">Fri</div>
+            <div class="timetable-day-header" id="ttH6">Sat</div>
+          </div>
+          <div class="timetable-body" id="timetableBody"></div>
+        </div>
+      </div>
+
+      <!-- ─── ALARMS VIEW ─── -->
+      <div class="view" id="view-alarms">
+        <div class="section-header">
+          <div class="section-title">Alarm Manager</div>
+          <button class="btn btn-primary btn-sm" onclick="openModal('alarmModal')"><i class="fa-solid fa-plus"></i> Add Alarm</button>
+        </div>
+        <div class="alarms-grid" id="alarmsList"></div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="openTaskModal()" data-tooltip="Quick Add Task">
+  <i class="fa-solid fa-plus"></i>
+</button>
+
+<!-- AI FAB -->
+<button class="ai-fab" onclick="toggleAIPanel()" data-tooltip="AI Assistant" id="aiFab">✨</button>
+
+<!-- AI Overlay -->
+<div class="ai-overlay" id="aiOverlay" onclick="toggleAIPanel()"></div>
+
+<!-- AI Panel -->
+<div class="ai-panel" id="aiPanel">
+  <div class="ai-panel-header">
+    <div class="ai-avatar">🤖</div>
+    <div>
+      <div class="ai-panel-title">AI Assistant <span class="premium-badge" id="premiumBadge" style="display:none;">✦ PRO</span></div>
+      <div class="ai-panel-sub" id="aiPanelSub">Powered by Claude · Always ready to help</div>
+    </div>
+    <button class="ai-panel-close" onclick="toggleAIPanel()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="ai-messages" id="aiMessages">
+    <div class="ai-msg assistant">
+      <div class="ai-msg-avatar">🤖</div>
+      <div class="ai-msg-bubble">
+        Hi! I'm your AI productivity assistant powered by Claude. I can help you manage tasks, suggest priorities, break down goals, and boost your productivity. What would you like to do today? ✨<br><br>
+        <span style="font-size:11px;color:var(--text3);">🆓 Free plan: <strong style="color:var(--accent3);">5 messages</strong> per session. <span style="color:var(--accent2);cursor:pointer;text-decoration:underline;" onclick="showUpgradeModal('intro')">Upgrade to Pro →</span></span>
+      </div>
+    </div>
+  </div>
+  <div class="ai-quick-chips">
+    <div class="ai-chip" onclick="aiQuickPrompt('Suggest 3 new tasks I should add based on my current tasks')">💡 Suggest tasks</div>
+    <div class="ai-chip" onclick="aiQuickPrompt('Analyze my task list and tell me what to prioritize first today')">🎯 Prioritize</div>
+    <div class="ai-chip" onclick="aiQuickPrompt('Give me 5 productivity tips for someone with my current workload')">⚡ Tips</div>
+    <div class="ai-chip" onclick="aiQuickPrompt('Summarize my current progress and give me a motivational message')">📊 My progress</div>
+  </div>
+  <div class="ai-free-counter" id="aiFreeCounter">
+    🆓 Free messages remaining: <strong id="freeCountDisplay">5</strong> / 5 &nbsp;·&nbsp;
+    <span style="color:var(--accent2);cursor:pointer;font-weight:700;" onclick="showUpgradeModal('counter')">Upgrade to Pro ✦</span>
+  </div>
+  <div class="ai-input-area">
+    <textarea class="ai-textarea" id="aiInput" placeholder="Ask me anything about your tasks..." rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAIMessage();}"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+    <button class="ai-send-btn" id="aiSendBtn" onclick="sendAIMessage()">
+      <i class="fa-solid fa-paper-plane"></i>
+    </button>
+  </div>
+</div>
+
+<!-- ─── PREMIUM UPGRADE MODAL ─── -->
+<div class="upgrade-overlay" id="upgradeModal">
+  <div class="upgrade-card">
+    <div class="upgrade-glow-top"></div>
+    <div class="upgrade-glow-bot"></div>
+    <button class="upgrade-close-btn" onclick="closeUpgradeModal()"><i class="fa-solid fa-xmark"></i></button>
+
+    <div class="upgrade-header">
+      <span class="upgrade-crown">👑</span>
+      <div class="upgrade-title">Unlock Task-Management Tracker Pro</div>
+      <div class="upgrade-sub">You've used all your free AI messages.</div>
+      <div class="upgrade-limit-msg" id="upgradeLimitMsg">⚠️ Free limit reached — upgrade to continue chatting with AI</div>
+    </div>
+
+    <div class="upgrade-body">
+      <div class="upgrade-grid">
+        <!-- Features -->
+        <div class="upgrade-features">
+          <div class="upgrade-feature-item">
+            <div class="upgrade-feature-icon" style="background:rgba(124,58,237,0.2);color:#a78bfa;">♾️</div>
+            <div>
+              <div class="upgrade-feature-title">Unlimited AI Messages</div>
+              <div class="upgrade-feature-desc">Chat with Claude AI as much as you need</div>
+            </div>
+          </div>
+          <div class="upgrade-feature-item">
+            <div class="upgrade-feature-icon" style="background:rgba(6,182,212,0.2);color:#67e8f9;">⚡</div>
+            <div>
+              <div class="upgrade-feature-title">Priority AI Responses</div>
+              <div class="upgrade-feature-desc">Faster responses, smarter suggestions</div>
+            </div>
+          </div>
+          <div class="upgrade-feature-item">
+            <div class="upgrade-feature-icon" style="background:rgba(16,185,129,0.2);color:#6ee7b7;">📊</div>
+            <div>
+              <div class="upgrade-feature-title">Advanced Analytics</div>
+              <div class="upgrade-feature-desc">Deep insights into your productivity</div>
+            </div>
+          </div>
+          <div class="upgrade-feature-item">
+            <div class="upgrade-feature-icon" style="background:rgba(245,158,11,0.2);color:#fcd34d;">🔒</div>
+            <div>
+              <div class="upgrade-feature-title">Pro Badge &amp; Features</div>
+              <div class="upgrade-feature-desc">Exclusive Pro features &amp; priority support</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QR + Price -->
+        <div class="upgrade-qr-box">
+          <div class="upgrade-price-badge">
+            <span class="upgrade-currency">₹</span>
+            <span class="upgrade-amount">99</span>
+            <span class="upgrade-period">/month</span>
+          </div>
+          <img class="upgrade-qr-img" id="upgradeQR"
+            src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi%3A%2F%2Fpay%3Fpa%3Dsubhambisoyi892%40okicici%26pn%3DSubham%2520Bisoyi%26am%3D99%26cu%3DINR%26tn%3DTask%2520Management%2520Tracker%2520Pro"
+            alt="Scan to Pay" />
+          <div class="upgrade-qr-label">Scan with any UPI app<br>GPay · PhonePe · Paytm · BHIM</div>
+          <div class="upgrade-qr-id">subhambisoyi892@okicici</div>
+        </div>
+      </div>
+
+      <div class="upgrade-divider">After payment, enter your unlock code</div>
+
+      <div class="upgrade-unlock-row">
+        <input class="upgrade-code-input" id="upgradeCodeInput" placeholder="Enter unlock code..." maxlength="20"
+          onkeydown="if(event.key==='Enter')submitUpgradeCode()" />
+        <button class="upgrade-submit-btn" onclick="submitUpgradeCode()">
+          <i class="fa-solid fa-unlock"></i> Unlock
+        </button>
+      </div>
+      <div class="upgrade-msg" id="upgradeMsg"></div>
+
+      <div class="upgrade-demo-note">
+        Testing the app? Use demo code:
+        <span class="upgrade-demo-code" onclick="document.getElementById('upgradeCodeInput').value='TASKPRO2025'">TASKPRO2025</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── POMODORO MODAL ─── -->
+<div class="modal-overlay" id="pomoModal">
+  <div class="modal" style="width:400px;text-align:center;">
+    <div class="modal-header">
+      <div class="modal-title">🍅 Pomodoro Timer</div>
+      <button class="modal-close" onclick="closeModal('pomoModal');stopPomo()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="pomo-display">
+      <div style="position:relative;display:inline-block;margin-bottom:8px;">
+        <svg width="140" height="140" style="transform:rotate(-90deg);">
+          <defs>
+            <linearGradient id="pomoGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#7c3aed"/>
+              <stop offset="100%" stop-color="#06b6d4"/>
+            </linearGradient>
+          </defs>
+          <circle cx="70" cy="70" r="54" fill="none" stroke="var(--surface3)" stroke-width="8"/>
+          <circle id="pomoRing" cx="70" cy="70" r="54" fill="none" stroke="url(#pomoGrad)" stroke-width="8"
+            stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="339.3"
+            style="transition:stroke-dashoffset 1s linear;"/>
+        </svg>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
+          <div class="pomo-timer" id="pomoTime" style="font-size:36px;">25:00</div>
+          <div class="pomo-mode-label" id="pomoLabel">Focus Session</div>
+        </div>
+      </div>
+    </div>
+    <div class="pomo-sessions" id="pomoSessions">
+      <div class="pomo-dot active" id="pd0"></div>
+      <div class="pomo-dot" id="pd1"></div>
+      <div class="pomo-dot" id="pd2"></div>
+      <div class="pomo-dot" id="pd3"></div>
+    </div>
+    <div class="pomo-controls">
+      <button class="btn btn-secondary" onclick="resetPomo()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+      <button class="btn btn-primary" id="pomoBtn" onclick="togglePomo()"><i class="fa-solid fa-play"></i> Start</button>
+      <button class="btn btn-secondary" onclick="skipPomo()"><i class="fa-solid fa-forward-step"></i> Skip</button>
+    </div>
+    <div style="margin-top:20px;font-size:12px;color:var(--text3);">
+      25 min focus · 5 min break · Long break after 4 sessions
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
